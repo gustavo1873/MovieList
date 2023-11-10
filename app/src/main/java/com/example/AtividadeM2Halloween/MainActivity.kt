@@ -15,47 +15,53 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.room.Room
-import com.example.AtividadeM2Halloween.database.AppDatabase
+import androidx.lifecycle.lifecycleScope
+import com.example.AtividadeM2Halloween.database.model.Top10
 import com.example.AtividadeM2Halloween.ui.theme.AtividadeM2HalloweenTheme
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
 
     var isFavorite = false
-
-    companion object {
-        lateinit var database: AppDatabase
-    }
-
     private val name = arrayOf("Pearl", "Panico VI", "Panico V", "Sorria", "M3GAN", "A Freira",
         "A Freira 2", "Nós", "Corra!", "Invocacao do Mal")
 
     private val image = arrayOf(R.drawable.pearl, R.drawable.panico6, R.drawable.panico5, R.drawable.sorria, R.drawable.m3gan,
         R.drawable.freira, R.drawable.freira2, R.drawable.nos, R.drawable.corra, R.drawable.invocacao)
 
+    private lateinit var movieListAdapter: MovieListAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById<ListView>(R.id.list_view).adapter = MovieListAdapter(this, image, name)
+        movieListAdapter = MovieListAdapter(this, image, name)
+        findViewById<ListView>(R.id.list_view).adapter = movieListAdapter
 
         val favoriteButton = findViewById<ImageButton>(R.id.favoriteButton)
 
         favoriteButton.setOnClickListener {
-            isFavorite = !isFavorite
-            if (isFavorite) {
-                favoriteButton.setImageResource(R.drawable.ic_star)
-            } else {
-                favoriteButton.setImageResource(R.drawable.ic_star_border)
+            val selectedPosition = movieListAdapter.selectedPosition
+
+            if (selectedPosition != -1) {
+                isFavorite = !isFavorite
+
+                if (isFavorite) {
+                    favoriteButton.setImageResource(R.drawable.ic_star)
+
+                    val selectedMovie = Top10(name = name[selectedPosition], imageResourceId = image[selectedPosition])
+
+
+                    lifecycleScope.launch {
+                        MeuApp.database.top10Dao().insertTop10(selectedMovie)
+                    }
+                } else {
+                    favoriteButton.setImageResource(R.drawable.ic_star_border)
+
+                }
             }
         }
-        database = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java, "app-database"
-        ).build()
     }
-
-
-
 }
+

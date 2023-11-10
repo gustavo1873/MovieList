@@ -10,6 +10,7 @@ import com.example.AtividadeM2Halloween.R
 
 class MovieListAdapter(private val context: Context, private val images: Array<Int>, private val names: Array<String>) : BaseAdapter() {
 
+    var selectedPosition: Int = -1
     private val favoriteStates = BooleanArray(images.size)
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
@@ -31,19 +32,24 @@ class MovieListAdapter(private val context: Context, private val images: Array<I
         viewHolder.name?.text = names[position]
         viewHolder.image?.setImageResource(images[position])
 
-        // Set the favorite button state based on the saved favorite state
+
         viewHolder.favoriteButton?.setImageResource(
             if (favoriteStates[position]) R.drawable.ic_star else R.drawable.ic_star_border
         )
 
-        viewHolder.favoriteButton?.setOnClickListener {
-            // Toggle the favorite state for the clicked item
+
+        view?.setOnClickListener {
+
             favoriteStates[position] = !favoriteStates[position]
 
-            // Update the favorite button image accordingly
+
             viewHolder.favoriteButton?.setImageResource(
                 if (favoriteStates[position]) R.drawable.ic_star else R.drawable.ic_star_border
             )
+
+
+            selectedPosition = position
+            notifyDataSetChanged()
         }
 
         return view!!
@@ -67,3 +73,4 @@ class MovieListAdapter(private val context: Context, private val images: Array<I
         var favoriteButton: ImageButton? = null
     }
 }
+

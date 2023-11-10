@@ -1,3 +1,4 @@
+
 package com.example.AtividadeM2Halloween.database.model
 
 import androidx.room.Entity
@@ -10,3 +11,4 @@ data class Top10(
     val name: String,
     val imageResourceId: Int
 )
+
